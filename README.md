@@ -1,6 +1,6 @@
-# imoocmall
+# shop
 
-> Imooc Mall 
+>shop practicing, a simple shop
 
 ## Build Setup
 
