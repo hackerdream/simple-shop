@@ -4,12 +4,16 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueLazyLoad from 'vue-lazyload'
+import axios from 'axios'
+import infiniteScroll from 'vue-infinite-scroll'
 
 Vue.config.productionTip = false;
+Vue.prototype.$http = axios
 
 Vue.use(VueLazyLoad,{
   loading:"/static/loading-svg/loading-bars.svg" 
 })
+Vue.use(infiniteScroll);
 
 /* eslint-disable no-new */
 new Vue({

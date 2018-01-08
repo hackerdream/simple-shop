@@ -13,7 +13,7 @@ var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = require('./webpack.dev.conf')
 
 // default port where dev server listens for incoming traffic
-var port = process.env.PORT || 8080 //config.dev.port
+var port = process.env.PORT || 8989//config.dev.port //8080 
 // automatically open browser, if not set will be false
 var autoOpenBrowser = !!config.dev.autoOpenBrowser
 // Define HTTP proxies to your custom API backend
@@ -43,7 +43,9 @@ var hotMiddleware = require('webpack-hot-middleware')(compiler, {
 // force page reload when html-webpack-plugin template changes
 compiler.plugin('compilation', function (compilation) {
   compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
-    hotMiddleware.publish({ action: 'reload' })
+    hotMiddleware.publish({
+      action: 'reload'
+    })
     cb()
   })
 })
@@ -52,7 +54,9 @@ compiler.plugin('compilation', function (compilation) {
 Object.keys(proxyTable).forEach(function (context) {
   var options = proxyTable[context]
   if (typeof options === 'string') {
-    options = { target: options }
+    options = {
+      target: options
+    }
   }
   app.use(proxyMiddleware(options.filter || context, options))
 })
