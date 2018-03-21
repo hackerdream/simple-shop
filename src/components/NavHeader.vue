@@ -105,6 +105,7 @@
             this.isLoginTrue = true;
             this.user = this.username;
             this.$emit('loginChange');
+            this.$emit('reGetAddress');
           }
         }).catch((err) => {
           console.log(err);
@@ -115,6 +116,7 @@
           if (res.data.status === 0) {
             this.isLoginTrue = false;
             this.$emit('loginChange');
+            this.$emit('reGetAddress');            
           }
         })
       },

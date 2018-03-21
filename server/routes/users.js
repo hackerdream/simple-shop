@@ -82,7 +82,6 @@ user.get("/checkLogin", function (req, res, next) {
   }
 })
 
-
 //查看当前用户的购物车
 user.get('/cartList', function (req, res, next) {
   let userId = req.session.userId;
@@ -144,7 +143,7 @@ user.post("/editCart", function (req, res, next) {
     productId = req.body.productId,
     productNum = req.body.productNum,
     checked = req.body.checked;
-  console.log(productId,productNum,checked)
+  console.log(productId, productNum, checked)
   User.update({
     "userId": userId,
     "cartList.productId": productId
@@ -170,44 +169,120 @@ user.post("/editCart", function (req, res, next) {
 
 
 //全部选择与全部不选择
-user.post("/selectAll",function(req,res,next){
-  let selectAll = req.body.selectAll === true?1:0;
+user.post("/selectAll", function (req, res, next) {
+  let selectAll = req.body.selectAll === true ? 1 : 0;
   let userId = req.session.userId;
 
-  User.findOne({userId:userId},function(err,doc){
-    if(err){
+  User.findOne({
+    userId: userId
+  }, function (err, doc) {
+    if (err) {
       res.json({
-        status:1,
-        msg:err.message,
-        result:''
+        status: 1,
+        msg: err.message,
+        result: ''
       })
-    }else{
-      if(doc){
+    } else {
+      if (doc) {
         doc.cartList.forEach(item => {
-            if(item.checked !== selectAll){
-                item.checked = selectAll;
-            }
+          if (item.checked !== selectAll) {
+            item.checked = selectAll;
+          }
         });
 
-        doc.save(function(err1,doc1){
-            if(err1){
-              res.json({
-                status:1,
-                msg:err.message,
-                result:''
-              })
-            }else{
-              res.json({
-                status:0,
-                msg:'',
-                result:"update success"
-              })
-            }
+        doc.save(function (err1, doc1) {
+          if (err1) {
+            res.json({
+              status: 1,
+              msg: err.message,
+              result: ''
+            })
+          } else {
+            res.json({
+              status: 0,
+              msg: '',
+              result: "update success"
+            })
+          }
         })
       }
     }
   })
 
-  
+
 })
 module.exports = user;
+
+
+//完成地址的获取
+user.get("/getAddress", function (req, res, next) {
+  var userId = req.session.userId;
+  User.findOne({
+    userId: userId
+  }, function (err, doc) {
+    if (err) {
+      res.json({
+        status: 1,
+        msg: err.message,
+        result: ''
+      })
+    } else {
+      res.json({
+        status: 0,
+        msg: '',
+        result: doc.addressList
+      })
+    }
+  })
+})
+
+//设置默认地址
+user.post("/setDefault", function (req, res, next) {
+  var userId = req.session.userId;
+  var addressId = req.body.addressId;
+  if (addressId === undefined) {
+    res.json({
+      status: 1001,
+      msg: "addressId is null",
+      result: ''
+    })
+  }else{
+    User.findOne({
+      userId: userId
+    }, function (err, doc) {
+      if (err) {
+        res.json({
+          status: 1,
+          msg: err.message,
+          result: ''
+        })
+      } else {
+  
+        doc.addressList.forEach((item) => {
+          if (item.addressId === addressId) {
+            item.isDefault = true;
+          } else {
+            item.isDefault = false;
+          }
+        })
+  
+        doc.save(function (err1, doc1) {
+          if (err) {
+            res.json({
+              status: 1,
+              msg: err.message,
+              result: ''
+            })
+          } else {
+            res.json({
+              status: 0,
+              msg: '',
+              result:""
+            })
+          }
+        })
+      }
+    })
+  }
+
+})

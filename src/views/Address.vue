@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav-header></nav-header>
+    <nav-header @reGetAddress ="reGetAdd()"></nav-header>
     <div class="checkout-page">
       <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -66,11 +66,11 @@
           <div class="addr-list-wrap">
             <div class="addr-list">
               <ul>
-                <li>
+                <li v-for="(add,index) in addressListFilter" :key="add.addressId">
                   <dl>
-                    <dt>XXX</dt>
-                    <dd class="address">朝阳公园</dd>
-                    <dd class="tel">10000000000</dd>
+                    <dt>{{add.userName}}</dt>
+                    <dd class="address">{{add.streetName}}</dd>
+                    <dd class="tel">{{add.addressId}}</dd>
                   </dl>
                   <div class="addr-opration addr-del">
                     <a href="javascript:;" class="addr-del-btn">
@@ -79,12 +79,12 @@
                       </svg>
                     </a>
                   </div>
-                  <div class="addr-opration addr-set-default">
-                    <a href="javascript:;" class="addr-set-default-btn">
+                  <div class="addr-opration addr-default">
+                    <a href="javascript:;" class="addr-set-default-btn" v-if="!add.isDefault"   @click="setDefault(add.addressId)">
                       <i>Set default</i>
                     </a>
                   </div>
-                  <div class="addr-opration addr-default">Default address</div>
+                  <div class="addr-opration addr-default"  v-if="add.isDefault" >Default address</div>
                 </li>
                 <li class="addr-new">
                   <div class="add-new-inner">
@@ -100,7 +100,7 @@
             </div>
 
             <div class="shipping-addr-more">
-              <a class="addr-more-btn up-down-btn" href="javascript:;">
+              <a class="addr-more-btn up-down-btn" href="javascript:;" @click = "expand" :class="{'open':this.show}">
                 more
                 <i class="i-up-down">
                   <i class="i-up-down-l"></i>
@@ -151,14 +151,54 @@
   import NavFooter from '@/components/NavFooter.vue'
   import NavBread from '@/components/NavBread.vue'
   export default {
+    mounted() {
+        this.getAddress();
+    },
     data() {
-      return {};
+      return {
+        addressList: [],
+        limit:3,
+        show:false
+      };
     },
     components: {
       NavHeader,
       NavFooter,
       NavBread
     },
+    computed:{
+        addressListFilter(){
+            return  this.addressList.slice(0,this.limit)
+        }
+    },
+    methods:{
+        getAddress(){
+            this.$http.get("/users/getAddress").then((res)=>{
+                this.addressList = res.data.result;
+            }).catch((err)=>{console.log(err);})
+        },
+        expand(){
+            if(this.limit == 3){
+                this.limit = this.addressList.length;
+                this.show = true;
+            }else{
+                 this.limit = 3;
+                this.show = false ;
+            }
+        },
+        setDefault(id){
+            this.$http.post("/users/setDefault",{
+                addressId:id
+            }).then((res)=>{
+                this.getAddress();
+            }).catch((err)=>{
+                console.log(err);
+            })
+        },
+        reGetAdd(){
+            this.getAddress();
+        }
+    }
   };
 
 </script>
