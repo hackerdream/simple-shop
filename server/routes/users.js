@@ -135,6 +135,7 @@ user.delete('/deleteGood', function (req, res, next) {
       })
     }
   })
+
 })
 
 //修改购物车里的商品数量
@@ -277,7 +278,7 @@ user.post("/setDefault", function (req, res, next) {
             res.json({
               status: 0,
               msg: '',
-              result:""
+              result:"is ok"
             })
           }
         })
@@ -285,4 +286,27 @@ user.post("/setDefault", function (req, res, next) {
     })
   }
 
+})
+
+
+//删除默认地址
+user.delete("/deleteAddress",function(req,res,next){
+  let userId = req.session.userId,addressId = req.query.addressId;
+  
+  console.log(userId,addressId);
+  User.update({userId:userId},{$pull:{'addressList':{addressId:addressId}}},function(err,doc){
+      if(err){
+        res.json({
+          status: 1,
+          msg: err.msg,
+          result: ''
+        })
+      }else{
+        res.json({
+          status:0,
+          msg:"",
+          result:"OK"
+        })
+      }
+  })
 })

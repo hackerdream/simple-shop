@@ -73,7 +73,7 @@
                     <dd class="tel">{{add.addressId}}</dd>
                   </dl>
                   <div class="addr-opration addr-del">
-                    <a href="javascript:;" class="addr-del-btn">
+                    <a href="javascript:;" class="addr-del-btn" @click="deleteAddress(add.addressId)">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -197,6 +197,15 @@
         },
         reGetAdd(){
             this.getAddress();
+        },
+        deleteAddress(id){
+            this.$http.delete("/users/deleteAddress?addressId="+id).then((res)=>{
+                if(res.data.status === 0){
+                    this.getAddress();
+                }
+            }).catch((err)=>{
+                console.log(err);
+            })
         }
     }
   };
