@@ -117,7 +117,7 @@
                 <span class="total-price">{{totalPrice | currency('¥')}}</span>
               </div>
               <div class="btn-wrap">
-                <a class="btn btn--red">Checkout</a>
+                <a class="btn btn--red" :class="{'btn-dis':checkedCount === 0}" @click="checkout()">Checkout</a>
               </div>
             </div>
           </div>
@@ -256,6 +256,13 @@
             this.getCartList();
           }
         })
+      },
+      checkout(){
+        if(this.checkedCount > 0){
+           this.$router.push({
+             path:'/address'
+           })
+        }
       }
     },
     computed: {
@@ -279,6 +286,15 @@
       },
       isSelectAll() {
         return this.cartList.length === this.cartCount;
+      },
+      checkedCount(){
+        var count = 0;
+        for(let i = 0 ; i < this.cartList.length ; i++){
+          if(this.cartList[i].checked){
+             count += this.cartList[i].productNum; 
+          }
+        }
+        return count;
       }
     }
   };
