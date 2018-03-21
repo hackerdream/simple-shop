@@ -1234,7 +1234,7 @@ html {
   transition: all .5s ease-out;
 }
 
-@media only screen and (max-width: 767px) {
+/* @media only screen and (max-width: 767px) {
   .md-modal {
     width: 300px !important;
   }
@@ -1305,4 +1305,4 @@ html {
   .md-modal.modal-normal .content-tit {
     font-size: 12px;
   }
-}
+} */

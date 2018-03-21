@@ -2,23 +2,17 @@
   <div>
 
     <nav-header></nav-header>
-    <div class="nav-breadcrumb-wrap">
-      <div class="container">
-        <nav class="nav-breadcrumb">
-          <a href="/">Home</a>
-          <span>Goods</span>
-        </nav>
-      </div>
-    </div>
+    <nav-bread :itemName = "'goods'"></nav-bread>
     <div class="accessory-result-page accessory-page">
       <div class="container">
         <div class="filter-nav">
           <span class="sortby">Sort by:</span>
           <a href="javascript:void(0)" class="default cur">Default</a>
           <a href="javascript:void(0)" class="price" @click="sortGoodsUp">Price
-            <svg class="icon icon-arrow-short">
-              <use xlink:href="#icon-arrow-short"></use>
+            <svg class="icon-arrow-short">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-short"></use>
             </svg>
+
           </a>
           <a href="javascript:void(0)" class="filterby stopPop" @click="showFilter">Filter by</a>
         </div>
@@ -28,7 +22,7 @@
             <dl class="filter-price">
               <dt>Price:</dt>
               <dd>
-                <a href="javascript:void(0)" :class="{'cur':priceLevel === 'all'}" @click="setPrice('all ')">All</a>
+                <a href="javascript:void(0)" :class="{'cur':priceLevel === 'all'}" @click="setPrice('all')">All</a>
               </dd>
               <dd v-for="(price,index) of priceFilter" :key="price.id">
                 <a href="javascript:void(0)" :class="{'cur':priceLevel === index}" @click="setPrice(index)">{{price.startPrice}} -- {{price.endPrice}}</a>
@@ -40,7 +34,7 @@
           <div class="accessory-list-wrap">
             <div class="accessory-list col-4">
 
-              <ul style="overflow:hidden">
+              <ul>
                 <li v-for="item of goodsList" :key="item._id">
                   <div class="pic">
                     <a href="#">
@@ -51,14 +45,15 @@
                     <div class="name">{{item.productName}}</div>
                     <div class="price">{{item.salePrice}}</div>
                     <div class="btn-area">
-                      <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                      <a href="javascript:;" class="btn btn--m" @click="addToCart(item.productId)">加入购物车</a>
                     </div>
                   </div>
                 </li>
               </ul>
 
-              <div style="text-align:center;width:100%;height:50px;line-height:40px;" v-if="isNull" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="30">
-                加载中...
+              <div style="text-align:center;width:100%;height:70px;line-height:50px;" v-if="isNull" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy"
+                infinite-scroll-distance="30">
+                <img src="../assets/loadImg/loading-spinning-bubbles.svg" alt="" v-if="isNull">
               </div>
             </div>
           </div>
@@ -73,10 +68,11 @@
 
 <script type="text/ecmascript-6">
   import '../assets/css/product.css'
+  import '../assets/css/checkout.css'
 
   import NavHeader from '@/components/NavHeader.vue'
   import NavFooter from '@/components/NavFooter.vue'
-
+  import NavBread from '@/components/NavBread.vue'
 
   export default {
     mounted() {
@@ -111,14 +107,15 @@
         goodsList: [],
         sortFlag: 1,
         page: 1,
-        pageSize: 8 ,
+        pageSize: 8,
         busy: true, //设置滚动
-        isNull: true        //判断是否还有数据请求
+        isNull: true //判断是否还有数据请求
       };
     },
     components: {
       NavHeader,
-      NavFooter
+      NavFooter,
+      NavBread
     },
     methods: {
       getGoodsList(flag) { //挂载的时候获取数据,flag判断是否是分页去获取
@@ -126,9 +123,9 @@
           page: this.page,
           pageSize: this.pageSize,
           sort: this.sortFlag,
-          priceLevel:this.priceLevel
+          priceLevel: this.priceLevel
         }
-        this.$http.get('/goods', {
+        this.$http.get('/goods/list', {
           params: args
         }).then((res) => {
           let data = res.data;
@@ -141,7 +138,7 @@
               } else {
                 this.busy = false;
               }
-              
+
             } else {
               this.goodsList = data.result.list;
               this.busy = false;
@@ -175,8 +172,31 @@
       },
       setPrice(args) {
         this.priceLevel = args;
+        this.page = 1;
         this.closeFilter();
         this.getGoodsList();
+      },
+      addToCart(productId) {
+        this.checkLogin();
+        this.$http.post('/goods/addCart', {
+          productId: productId
+        }).then((res) => {
+          if (res.data.status === 0) {
+            console.log("success");
+          } else {
+            console.log("errMsg:" + res.msg);
+          }
+        }).catch((err) => {
+          console.log(err);
+        })
+      },
+      checkLogin() {
+        this.$http.get("/users/checkLogin").then((res) => {
+          if (res.data.status !== 0) {
+            alert("请登录")
+            return;
+          }
+        })
       }
     }
   };
